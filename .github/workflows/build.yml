@@ -1,0 +1,87 @@
+name: Build LuaJIT
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+  
+  workflow_dispatch:
+
+jobs:
+  win-build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch:
+          - x86
+          - x64
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Build LuaJIT
+        run: |
+          cd ${{ github.workspace }}
+          git clone https://github.com/LuaJIT/LuaJIT.git
+          cd LuaJIT\src
+          .\msvcbuild
+
+      - name: Set LuaJIT REV_SHA
+        run: |
+          cd ${{ github.workspace }}\LuaJIT
+          $REV_SHA = git rev-parse HEAD
+
+      - name: Create BuildInfo File
+        run: |
+          cd ${{ github.workspace }}\LuaJIT
+          echo "LuaJIT-Auto Builds" >> About-This-Build.txt
+          echo "https://github.com/Per-Terra/LuaJIT-Auto-Builds" >> About-This-Build.txt
+          echo "" >> About-This-Build.txt
+          echo "LuaJIT 2.1.0-beta3 $REV_SHA" >> About-This-Build.txt
+          echo "https://github.com/LuaJIT/LuaJIT" >> About-This-Build.txt
+          echo "" >> About-This-Build.txt
+          echo "[Build Info.]" >> About-This-Build.txt
+          echo "OS: ${{ runner.os }} ${{ runner.arch }}" >> About-This-Build.txt
+
+      - name: Create Archive
+        run: |
+          cd ${{ github.workspace }}\LuaJIT
+          Compress-Archive doc,COPYRIGHT,README,src\lua51.dll,src\lua51.lib,About-This-Build.txt -DestinationPath LuaJIT-2.1.0-beta3_Win_${{ matrix.arch }}.zip
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: LuaJIT
+          path: ${{ github.workspace }}/LuaJIT/LuaJIT-2.1.0-beta3_Win_${{ matrix.arch }}.zip
+
+  create_release:
+    name: Create Release
+    needs: win-build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/download-artifact@v3
+      with:
+        name: LuaJIT
+        path: artifacts
+
+    - name: Get Date
+      id: get_date
+      run: |
+        DATE_TIME=`date +'%Y-%m-%d-%H-%M-%S'`
+        echo "::set-output name=DATE_TIME::${DATE_TIME}"
+
+    - name: Create a Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        RELEASE_NAME=Build-${{ steps.get_date.outputs.DATE_TIME }}
+        TAG_NAME=build-${{ steps.get_date.outputs.DATE_TIME }}
+        assets=()
+        for asset in ${{ github.workspace }}/artifacts/*.zip; do
+          assets+=("-a" "$asset")
+        done
+        hub release create "${assets[@]}" -m "$RELEASE_NAME" "$TAG_NAME"
