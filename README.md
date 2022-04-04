@@ -1,4 +1,5 @@
 # LuaJIT-Auto-Builds
+[![Build LuaJIT](https://github.com/Per-Terra/LuaJIT-Auto-Builds/actions/workflows/build.yml/badge.svg)](https://github.com/Per-Terra/LuaJIT-Auto-Builds/actions/workflows/build.yml)
 
 ## en
 This is an unofficial build of the v2.1 branch of [LuaJIT](https://github.com/LuaJIT/LuaJIT)
