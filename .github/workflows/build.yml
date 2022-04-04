@@ -27,20 +27,34 @@ jobs:
           cd ${{ github.workspace }}
           git clone https://github.com/LuaJIT/LuaJIT.git
           cd LuaJIT\src
-          .\msvcbuild
+          (Get-Content .\msvcbuild.bat -Raw) -replace '/MD','/MT' | Set-Content .\msvcbuild.bat
+          .\msvcbuild.bat
+
+      - name: Set workflow REV_LIST_COUNT
+        id: workflow-rev
+        run: |
+          cd ${{ github.workspace }}
+          $REVCOUNT = git rev-list --count HEAD
+          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          $SHA = git rev-parse HEAD
+          echo "::set-output name=REV_SHA::$SHA"
 
       - name: Set LuaJIT REV_SHA
+        id: luajit-rev
         run: |
           cd ${{ github.workspace }}\LuaJIT
-          $REV_SHA = git rev-parse HEAD
+          $REVCOUNT = git rev-list --count HEAD
+          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          $SHA = git rev-parse HEAD
+          echo "::set-output name=REV_SHA::$SHA"
 
       - name: Create BuildInfo File
         run: |
           cd ${{ github.workspace }}\LuaJIT
-          echo "LuaJIT-Auto Builds" >> About-This-Build.txt
+          echo "LuaJIT-Auto Builds r${{ steps.workflow-rev.outputs.REV_LIST_COUNT }}" >> About-This-Build.txt
           echo "https://github.com/Per-Terra/LuaJIT-Auto-Builds" >> About-This-Build.txt
           echo "" >> About-This-Build.txt
-          echo "LuaJIT 2.1.0-beta3 $REV_SHA" >> About-This-Build.txt
+          echo "LuaJIT 2.1.0-beta3 ${{ steps.luajit-rev.outputs.REV_SHA }}" >> About-This-Build.txt
           echo "https://github.com/LuaJIT/LuaJIT" >> About-This-Build.txt
           echo "" >> About-This-Build.txt
           echo "[Build Info.]" >> About-This-Build.txt
