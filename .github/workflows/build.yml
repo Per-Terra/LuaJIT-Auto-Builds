@@ -35,18 +35,18 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           $REVCOUNT = git rev-list --count HEAD
-          echo "REV_LIST_COUNT=$REVCOUNT" >> $GITHUB_OUTPUT
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $env:GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "REV_SHA=$SHA" >> $GITHUB_OUTPUT
+          echo "REV_SHA=$SHA" >> $env:GITHUB_OUTPUT
 
       - name: Set LuaJIT REV_SHA
         id: luajit-rev
         run: |
           cd ${{ github.workspace }}\LuaJIT
           $REVCOUNT = git rev-list --count HEAD
-          echo "REV_LIST_COUNT=$REVCOUNT" >> $GITHUB_OUTPUT
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $env:GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "REV_SHA=$SHA" >> $GITHUB_OUTPUT
+          echo "REV_SHA=$SHA" >> $env:GITHUB_OUTPUT
 
       - name: Create BuildInfo File
         run: |
@@ -98,18 +98,18 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           $REVCOUNT = git rev-list --count HEAD
-          echo "REV_LIST_COUNT=$REVCOUNT" >> $GITHUB_OUTPUT
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $env:GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "REV_SHA=$SHA" >> $GITHUB_OUTPUT
+          echo "REV_SHA=$SHA" >> $env:GITHUB_OUTPUT
 
       - name: Set LuaJIT REV_SHA
         id: luajit-rev
         run: |
           cd ${{ github.workspace }}\luajit2
           $REVCOUNT = git rev-list --count HEAD
-          echo "REV_LIST_COUNT=$REVCOUNT" >> $GITHUB_OUTPUT
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $env:GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "REV_SHA=$SHA" >> $GITHUB_OUTPUT
+          echo "REV_SHA=$SHA" >> $env:GITHUB_OUTPUT
 
       - name: Create BuildInfo File
         run: |
