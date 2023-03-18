@@ -2,14 +2,14 @@
 [![Build LuaJIT](https://github.com/Per-Terra/LuaJIT-Auto-Builds/actions/workflows/build.yml/badge.svg)](https://github.com/Per-Terra/LuaJIT-Auto-Builds/actions/workflows/build.yml)
 
 ## en
-This is an unofficial build of the v2.1 branch of [LuaJIT](https://github.com/LuaJIT/LuaJIT)
+This is an unofficial build of the v2.1 branch of [LuaJIT](https://github.com/LuaJIT/LuaJIT) and the v2.1-agentzh branch of [openresty/luajit2](https://github.com/openresty/luajit2).
 
-As of 2022/04/04, only the build of the library for Winodws(x86/x64) is supported.
+As of 2023/03/18, only the build of the library for Winodws(x86/x64) is supported.
 
 ## ja
-[LuaJIT](https://github.com/LuaJIT/LuaJIT)のv2.1ブランチの非公式ビルドです。
+[LuaJIT](https://github.com/LuaJIT/LuaJIT)のv2.1ブランチ及び[openresty/luajit2](https://github.com/openresty/luajit2)のv2.1-agentzhブランチの非公式ビルドです。
 
-2022/04/04現在、Winodws(x86/x64)ビルドのみ対応しています。
+2023/03/18現在、Winodws(x86/x64)ビルドのみ対応しています。
 
 ## For AviUtl users
 Releasesから`LuaJIT-2.1.0-beta3_Win_x86.zip`をダウンロードし、中身のlua51.dllを付属のものと置き換えてください。
