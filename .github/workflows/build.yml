@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  win-build:
+  build-original:
     runs-on: windows-latest
     strategy:
       matrix:
@@ -70,9 +70,74 @@ jobs:
           name: LuaJIT
           path: ${{ github.workspace }}/LuaJIT/LuaJIT-2.1.0-beta3_Win_${{ matrix.arch }}.zip
 
+  build-openresty:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        arch:
+          - x86
+          - x64
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Build luajit2
+        run: |
+          cd ${{ github.workspace }}
+          git clone https://github.com/openresty/luajit2.git
+          cd luajit2\src
+          (Get-Content .\msvcbuild.bat -Raw) -replace '/MD','/MT' | Set-Content .\msvcbuild.bat
+          .\msvcbuild.bat
+
+      - name: Set workflow REV_LIST_COUNT
+        id: workflow-rev
+        run: |
+          cd ${{ github.workspace }}
+          $REVCOUNT = git rev-list --count HEAD
+          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          $SHA = git rev-parse HEAD
+          echo "::set-output name=REV_SHA::$SHA"
+
+      - name: Set LuaJIT REV_SHA
+        id: luajit-rev
+        run: |
+          cd ${{ github.workspace }}\luajit2
+          $REVCOUNT = git rev-list --count HEAD
+          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          $SHA = git rev-parse HEAD
+          echo "::set-output name=REV_SHA::$SHA"
+
+      - name: Create BuildInfo File
+        run: |
+          cd ${{ github.workspace }}\luajit2
+          echo "LuaJIT-Auto Builds r${{ steps.workflow-rev.outputs.REV_LIST_COUNT }}" >> About-This-Build.txt
+          echo "https://github.com/Per-Terra/LuaJIT-Auto-Builds" >> About-This-Build.txt
+          echo "" >> About-This-Build.txt
+          echo "openresty/luajit2 ${{ steps.luajit-rev.outputs.REV_SHA }}" >> About-This-Build.txt
+          echo "https://github.com/openresty/luajit2" >> About-This-Build.txt
+          echo "" >> About-This-Build.txt
+          echo "[Build Info.]" >> About-This-Build.txt
+          echo "OS: ${{ runner.os }} ${{ runner.arch }}" >> About-This-Build.txt
+
+      - name: Create Archive
+        run: |
+          cd ${{ github.workspace }}\luajit2
+          Compress-Archive doc,COPYRIGHT,README,README.md,src\lua51.dll,src\lua51.lib,About-This-Build.txt -DestinationPath LuaJIT-2.1.0-beta3_OpenResty_Win_${{ matrix.arch }}.zip
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: LuaJIT
+          path: ${{ github.workspace }}/luajit2/LuaJIT-2.1.0-beta3_OpenResty_Win_${{ matrix.arch }}.zip
+
   create_release:
     name: Create Release
-    needs: win-build
+    needs:
+      - build-original
+      - build-openresty
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
