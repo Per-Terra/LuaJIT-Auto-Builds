@@ -35,18 +35,18 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           $REVCOUNT = git rev-list --count HEAD
-          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "::set-output name=REV_SHA::$SHA"
+          echo "REV_SHA=$SHA" >> $GITHUB_OUTPUT
 
       - name: Set LuaJIT REV_SHA
         id: luajit-rev
         run: |
           cd ${{ github.workspace }}\LuaJIT
           $REVCOUNT = git rev-list --count HEAD
-          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "::set-output name=REV_SHA::$SHA"
+          echo "REV_SHA=$SHA" >> $GITHUB_OUTPUT
 
       - name: Create BuildInfo File
         run: |
@@ -98,18 +98,18 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           $REVCOUNT = git rev-list --count HEAD
-          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "::set-output name=REV_SHA::$SHA"
+          echo "REV_SHA=$SHA" >> $GITHUB_OUTPUT
 
       - name: Set LuaJIT REV_SHA
         id: luajit-rev
         run: |
           cd ${{ github.workspace }}\luajit2
           $REVCOUNT = git rev-list --count HEAD
-          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "::set-output name=REV_SHA::$SHA"
+          echo "REV_SHA=$SHA" >> $GITHUB_OUTPUT
 
       - name: Create BuildInfo File
         run: |
@@ -151,7 +151,7 @@ jobs:
       id: get_date
       run: |
         DATE_TIME=`date +'%Y-%m-%d-%H-%M-%S'`
-        echo "::set-output name=DATE_TIME::${DATE_TIME}"
+        echo "DATE_TIME=${DATE_TIME}" >> $GITHUB_OUTPUT
 
     - name: Create a Release
       env:
