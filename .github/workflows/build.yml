@@ -8,8 +8,8 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        version: [2.0, 2.1]
-        arch: [x64, x86]
+        version: ["2.0", "2.1"]
+        arch: ["x64", "x86"]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -74,7 +74,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        arch: [x64, x86]
+        arch: ["x64", "x86"]
     steps:
       - uses: actions/checkout@v4
         with:
