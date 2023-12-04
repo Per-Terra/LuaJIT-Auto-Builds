@@ -5,7 +5,6 @@ on:
 
 jobs:
   build-original:
-    name: Build LuaJIT
     runs-on: windows-latest
     strategy:
       matrix:
@@ -70,7 +69,6 @@ jobs:
           path: ${{ github.workspace }}/luajit/LuaJIT_${{ matrix.version }}_Win_${{ matrix.arch }}.zip
 
   build-openresty:
-    name: Build OpenResty's LuaJIT
     runs-on: windows-latest
     strategy:
       matrix:
