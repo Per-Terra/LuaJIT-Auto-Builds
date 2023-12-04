@@ -154,6 +154,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          RELEASE_NAME=Build-${{ steps.get_date.outputs.DATE_TIME }}
-          TAG_NAME=build-${{ steps.get_date.outputs.DATE_TIME }}
+          RELEASE_NAME=Build-${{ steps.datetime.outputs.DATE_TIME }}
+          TAG_NAME=build-${{ steps.datetime.outputs.DATE_TIME }}
           gh release create "$TAG_NAME" ${{ github.workspace }}/artifacts/*.zip --title "$RELEASE_NAME" --notes "AviUtl用には\`LuaJIT_2.1_Win_x86.zip\`をダウンロードすることをお勧めします。"
