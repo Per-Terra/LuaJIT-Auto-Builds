@@ -1,9 +1,6 @@
-name: Build LuaJIT
-
 on:
   schedule:
-  - cron: "0 0 * * *"
-  
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 jobs:
@@ -11,12 +8,12 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        arch:
-          - x86
-          - x64
-
+        version: [2.1]
+        arch: [x64, x86]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: ilammy/msvc-dev-cmd@v1
         with:
@@ -25,142 +22,138 @@ jobs:
       - name: Build LuaJIT
         run: |
           cd ${{ github.workspace }}
-          git clone https://github.com/LuaJIT/LuaJIT.git
-          cd LuaJIT\src
-          (Get-Content .\msvcbuild.bat -Raw) -replace '/MD','/MT' | Set-Content .\msvcbuild.bat
+          git clone https://luajit.org/git/luajit.git
+          cd .\luajit\src
+          (Get-Content .\msvcbuild.bat -Raw) -replace '/MD', '/MT' | Set-Content .\msvcbuild.bat
           .\msvcbuild.bat
 
-      - name: Set workflow REV_LIST_COUNT
+      - name: Set workflow revision
         id: workflow-rev
         run: |
           cd ${{ github.workspace }}
           $REVCOUNT = git rev-list --count HEAD
-          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $env:GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "::set-output name=REV_SHA::$SHA"
+          echo "REV_SHA=$SHA" >> $env:GITHUB_OUTPUT
 
-      - name: Set LuaJIT REV_SHA
+      - name: Set LuaJIT revision
         id: luajit-rev
         run: |
-          cd ${{ github.workspace }}\LuaJIT
+          cd ${{ github.workspace }}\luajit
           $REVCOUNT = git rev-list --count HEAD
-          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $env:GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "::set-output name=REV_SHA::$SHA"
+          echo "REV_SHA=$SHA" >> $env:GITHUB_OUTPUT
 
-      - name: Create BuildInfo File
+      - name: Create About-This-Build.txt
         run: |
-          cd ${{ github.workspace }}\LuaJIT
-          echo "LuaJIT-Auto Builds r${{ steps.workflow-rev.outputs.REV_LIST_COUNT }}" >> About-This-Build.txt
+          cd ${{ github.workspace }}\luajit
+          echo "LuaJIT-Auto-Builds r${{ steps.workflow-rev.outputs.REV_LIST_COUNT }}" >> About-This-Build.txt
           echo "https://github.com/Per-Terra/LuaJIT-Auto-Builds" >> About-This-Build.txt
           echo "" >> About-This-Build.txt
-          echo "LuaJIT 2.1.0-beta3 ${{ steps.luajit-rev.outputs.REV_SHA }}" >> About-This-Build.txt
-          echo "https://github.com/LuaJIT/LuaJIT" >> About-This-Build.txt
+          echo "LuaJIT ${{ matrix.version }} ${{ steps.luajit-rev.outputs.REV_SHA }}" >> About-This-Build.txt
+          echo "https://luajit.org/git/luajit.git" >> About-This-Build.txt
           echo "" >> About-This-Build.txt
           echo "[Build Info.]" >> About-This-Build.txt
           echo "OS: ${{ runner.os }} ${{ runner.arch }}" >> About-This-Build.txt
 
-      - name: Create Archive
+      - name: Create archive
         run: |
-          cd ${{ github.workspace }}\LuaJIT
-          Compress-Archive doc,COPYRIGHT,README,src\lua51.dll,src\lua51.lib,About-This-Build.txt -DestinationPath LuaJIT-2.1.0-beta3_Win_${{ matrix.arch }}.zip
+          cd ${{ github.workspace }}\luajit
+          Compress-Archive doc, COPYRIGHT, README, src\lua51.dll, src\lua51.lib, About-This-Build.txt -DestinationPath LuaJIT_${{ matrix.version }}_Win_${{ matrix.arch }}.zip
 
-      - uses: actions/upload-artifact@v3
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
           name: LuaJIT
-          path: ${{ github.workspace }}/LuaJIT/LuaJIT-2.1.0-beta3_Win_${{ matrix.arch }}.zip
+          path: ${{ github.workspace }}/luajit/LuaJIT_${{ matrix.version }}_Win_${{ matrix.arch }}.zip
 
   build-openresty:
     runs-on: windows-latest
     strategy:
       matrix:
-        arch:
-          - x86
-          - x64
-
+        arch: [x64, x86]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
 
-      - name: Build luajit2
+      - name: Build LuaJIT
         run: |
           cd ${{ github.workspace }}
           git clone https://github.com/openresty/luajit2.git
-          cd luajit2\src
-          (Get-Content .\msvcbuild.bat -Raw) -replace '/MD','/MT' | Set-Content .\msvcbuild.bat
+          cd .\luajit2\src
+          (Get-Content .\msvcbuild.bat -Raw) -replace '/MD', '/MT' | Set-Content .\msvcbuild.bat
           .\msvcbuild.bat
 
-      - name: Set workflow REV_LIST_COUNT
+      - name: Set workflow revision
         id: workflow-rev
         run: |
           cd ${{ github.workspace }}
           $REVCOUNT = git rev-list --count HEAD
-          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $env:GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "::set-output name=REV_SHA::$SHA"
+          echo "REV_SHA=$SHA" >> $env:GITHUB_OUTPUT
 
-      - name: Set LuaJIT REV_SHA
+      - name: Set LuaJIT revision
         id: luajit-rev
         run: |
           cd ${{ github.workspace }}\luajit2
           $REVCOUNT = git rev-list --count HEAD
-          echo "::set-output name=REV_LIST_COUNT::$REVCOUNT"
+          echo "REV_LIST_COUNT=$REVCOUNT" >> $env:GITHUB_OUTPUT
           $SHA = git rev-parse HEAD
-          echo "::set-output name=REV_SHA::$SHA"
+          echo "REV_SHA=$SHA" >> $env:GITHUB_OUTPUT
 
-      - name: Create BuildInfo File
+      - name: Create About-This-Build.txt
         run: |
           cd ${{ github.workspace }}\luajit2
-          echo "LuaJIT-Auto Builds r${{ steps.workflow-rev.outputs.REV_LIST_COUNT }}" >> About-This-Build.txt
+          echo "LuaJIT-Auto-Builds r${{ steps.workflow-rev.outputs.REV_LIST_COUNT }}" >> About-This-Build.txt
           echo "https://github.com/Per-Terra/LuaJIT-Auto-Builds" >> About-This-Build.txt
           echo "" >> About-This-Build.txt
-          echo "openresty/luajit2 ${{ steps.luajit-rev.outputs.REV_SHA }}" >> About-This-Build.txt
+          echo "LuaJIT 2.1 ${{ steps.luajit-rev.outputs.REV_SHA }}" >> About-This-Build.txt
           echo "https://github.com/openresty/luajit2" >> About-This-Build.txt
           echo "" >> About-This-Build.txt
           echo "[Build Info.]" >> About-This-Build.txt
           echo "OS: ${{ runner.os }} ${{ runner.arch }}" >> About-This-Build.txt
 
-      - name: Create Archive
+      - name: Create archive
         run: |
           cd ${{ github.workspace }}\luajit2
-          Compress-Archive doc,COPYRIGHT,README,README.md,src\lua51.dll,src\lua51.lib,About-This-Build.txt -DestinationPath LuaJIT-2.1.0-beta3_OpenResty_Win_${{ matrix.arch }}.zip
+          Compress-Archive doc, COPYRIGHT, README, README.md, src\lua51.dll, src\lua51.lib, About-This-Build.txt -DestinationPath LuaJIT_2.1_OpenResty_Win_${{ matrix.arch }}.zip
 
-      - uses: actions/upload-artifact@v3
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
           name: LuaJIT
-          path: ${{ github.workspace }}/luajit2/LuaJIT-2.1.0-beta3_OpenResty_Win_${{ matrix.arch }}.zip
+          path: ${{ github.workspace }}/luajit2/LuaJIT_2.1_OpenResty_Win_${{ matrix.arch }}.zip
 
-  create_release:
-    name: Create Release
+  create-release:
     needs:
       - build-original
       - build-openresty
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - uses: actions/download-artifact@v3
-      with:
-        name: LuaJIT
-        path: artifacts
+      - uses: actions/download-artifact@v3
+        with:
+          name: LuaJIT
+          path: artifacts
 
-    - name: Get Date
-      id: get_date
-      run: |
-        DATE_TIME=`date +'%Y-%m-%d-%H-%M-%S'`
-        echo "::set-output name=DATE_TIME::${DATE_TIME}"
+      - name: Set datetime
+        id: datetime
+        run: |
+          DATE_TIME=`date +'%Y-%m-%d-%H-%M-%S'`
+          echo "DATE_TIME=${DATE_TIME}" >> $GITHUB_OUTPUT
 
-    - name: Create a Release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        RELEASE_NAME=Build-${{ steps.get_date.outputs.DATE_TIME }}
-        TAG_NAME=build-${{ steps.get_date.outputs.DATE_TIME }}
-        assets=()
-        for asset in ${{ github.workspace }}/artifacts/*.zip; do
-          assets+=("-a" "$asset")
-        done
-        hub release create "${assets[@]}" -m "$RELEASE_NAME" "$TAG_NAME"
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASE_NAME=Build-${{ steps.get_date.outputs.DATE_TIME }}
+          TAG_NAME=build-${{ steps.get_date.outputs.DATE_TIME }}
+          gh release create "$TAG_NAME" ${{ github.workspace }}/artifacts/*.zip --title "$RELEASE_NAME" --notes "AviUtl用には\`LuaJIT_2.1_Win_x86.zip\`をダウンロードすることをお勧めします。"
