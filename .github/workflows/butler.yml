@@ -26,7 +26,7 @@ jobs:
         run: |
           $env:BUTLER_PKGS_DEPLOY_KEY | Out-File -Encoding utf8 -FilePath $env:USERPROFILE\.ssh\id_ed25519
           cd ${{ github.workspace }}
-          git config --global core.sshCommand 'ssh -i $env:USERPROFILE\.ssh\id_ed25519 -o UserKnownHostsFile=$env:USERPROFILE\.ssh\known_hosts'
+          git config --global core.sshCommand 'ssh -i $env:USERPROFILE\.ssh\id_ed25519 -o StrictHostKeyChecking=no'
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
