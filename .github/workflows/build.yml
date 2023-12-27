@@ -1,3 +1,5 @@
+name: Build LuaJIT
+
 on:
   schedule:
     - cron: "0 0 * * *"
