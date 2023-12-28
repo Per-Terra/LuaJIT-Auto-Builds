@@ -28,17 +28,19 @@ jobs:
         shell: pwsh
         run: |
           cd (Join-Path ${{ github.workspace }} butler-pkgs)
-          ./tools/CreateManifest.ps1 -Update -SourceUrl 'https://github.com/Per-Terra/LuaJIT-Auto-Builds/releases/latest/download/LuaJIT_2.1_Win_x86.zip' -Identifier 'LuaJIT' -Version '2.1' -ReleaseDate (Get-Date -Format 'yyyy-MM-dd') -Developer 'Per-Terra' -SkipPrompt -Force -Verbose
+          ./tools/CreateManifest.ps1 -Update -SourceUrl 'https://github.com/Per-Terra/LuaJIT-Auto-Builds/releases/latest/download/LuaJIT_2.1_Win_x86.zip' -Identifier 'LuaJIT' -Version '2.1' -ReleaseDate (Get-Date -Format 'yyyy-MM-dd') -Developer 'Per-Terra' -SkipPrompt -Force
 
       - name: Push Manifest
         # https://3nan3.github.io/post/2019122201_github_actions/
         env:
           BUTLER_PKGS_DEPLOY_KEY: ${{ secrets.BUTLER_PKGS_DEPLOY_KEY }}
         run: |
-          $env:BUTLER_PKGS_DEPLOY_KEY | Out-File -FilePath $env:USERPROFILE\.ssh\id_ed25519
-          icacls $env:USERPROFILE\.ssh\id_ed25519 /inheritance:r /grant:r "$env:USERNAME:(R)"
+          $sshKeyPath = Join-Path -Path $env:USERPROFILE -ChildPath '.ssh/id_ed25519'
+          New-Item -Path (Split-Path $sshKeyPath -Parent) -ItemType Directory -Force
+          Set-Content -Path $sshKeyPath -Value $env:BUTLER_PKGS_DEPLOY_KEY
+          icacls $sshKeyPath /inheritance:r /grant:r "$env:USERNAME:(R)"
           cd (Join-Path ${{ github.workspace }} butler-pkgs)
-          git config --global core.sshCommand 'ssh -i $env:USERPROFILE\.ssh\id_ed25519 -o StrictHostKeyChecking=no'
+          git config --global core.sshCommand "ssh -i $sshKeyPath -o StrictHostKeyChecking=no"
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
