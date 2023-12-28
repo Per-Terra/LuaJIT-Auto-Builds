@@ -35,12 +35,11 @@ jobs:
         env:
           BUTLER_PKGS_DEPLOY_KEY: ${{ secrets.BUTLER_PKGS_DEPLOY_KEY }}
         run: |
-          $sshKeyPath = Join-Path -Path $env:USERPROFILE -ChildPath '.ssh/id_ed25519'
-          New-Item -Path (Split-Path $sshKeyPath -Parent) -ItemType Directory -Force
-          Set-Content -Path $sshKeyPath -Value $env:BUTLER_PKGS_DEPLOY_KEY
-          icacls $sshKeyPath /inheritance:r /grant:r "$env:USERNAME:(R)"
           cd (Join-Path ${{ github.workspace }} butler-pkgs)
-          git config --global core.sshCommand "ssh -i $sshKeyPath -o StrictHostKeyChecking=no"
+          $deployKeyPath = "$env:USERPROFILE\deploy_key"
+          Set-Content -Path $deployKeyPath -Value $env:BUTLER_PKGS_DEPLOY_KEY
+          icacls $deployKeyPath /inheritance:r /grant:r "$($env:USERNAME):R"
+          git config --global core.sshCommand "ssh -i $deployKeyPath -o StrictHostKeyChecking=no"
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
