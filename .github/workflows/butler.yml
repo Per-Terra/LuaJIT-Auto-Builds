@@ -20,6 +20,7 @@ jobs:
           path: butler-pkgs
 
       - name: Create Manifest
+        shell: pwsh
         run: |
           cd (Join-Path ${{ github.workspace }} butler-pkgs)
           ./tools/CreateManifest.ps1 -Update -SourceUrl 'https://github.com/Per-Terra/LuaJIT-Auto-Builds/releases/latest/download/LuaJIT_2.1_Win_x86.zip' -Identifier 'LuaJIT' -Version '2.1' -ReleaseDate (Get-Date -Format 'yyyy-MM-dd') -Developer 'Per-Terra' -SkipPrompt -Force -Verbose
