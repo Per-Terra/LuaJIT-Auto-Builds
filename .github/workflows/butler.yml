@@ -19,6 +19,11 @@ jobs:
           repository: Per-Terra/butler-pkgs
           path: butler-pkgs
 
+      - name: Install and cache PowerShell modules
+        uses: potatoqualitee/psmodulecache@v6.0
+        with:
+          modules-to-cache: 7Zip4Powershell, powershell-yaml
+
       - name: Create Manifest
         shell: pwsh
         run: |
@@ -26,6 +31,7 @@ jobs:
           ./tools/CreateManifest.ps1 -Update -SourceUrl 'https://github.com/Per-Terra/LuaJIT-Auto-Builds/releases/latest/download/LuaJIT_2.1_Win_x86.zip' -Identifier 'LuaJIT' -Version '2.1' -ReleaseDate (Get-Date -Format 'yyyy-MM-dd') -Developer 'Per-Terra' -SkipPrompt -Force -Verbose
 
       - name: Push Manifest
+        # https://3nan3.github.io/post/2019122201_github_actions/
         env:
           BUTLER_PKGS_DEPLOY_KEY: ${{ secrets.BUTLER_PKGS_DEPLOY_KEY }}
         run: |
