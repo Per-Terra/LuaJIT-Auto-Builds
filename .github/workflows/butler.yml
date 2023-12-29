@@ -28,10 +28,12 @@ jobs:
           modules-to-cache: 7Zip4Powershell, powershell-yaml
 
       - name: Create Manifest
-        shell: pwsh
         run: |
           cd (Join-Path ${{ github.workspace }} butler-pkgs)
-          ./tools/CreateManifest.ps1 -Update -SourceUrl 'https://github.com/Per-Terra/LuaJIT-Auto-Builds/releases/latest/download/LuaJIT_2.1_Win_x86.zip' -Identifier 'LuaJIT' -Version '2.1' -ReleaseDate (Get-Date -Format 'yyyy-MM-dd') -Developer 'Per-Terra' -SkipPrompt -Force
+          $result = Invoke-RestMethod 'https://api.github.com/repos/Per-Terra/LuaJIT-Auto-Builds/releases/latest'
+          $url = $result.assets | Where-Object { $_.name -eq 'LuaJIT_2.1_Win_x86.zip' } | Select-Object -ExpandProperty browser_download_url
+          $date = $result.tag_name -replace '^build-', '' -replace '-\d{2}-\d{2}-\d{2}$', ''
+          ./tools/CreateManifest.ps1 -Update -SourceUrl $url -Identifier 'LuaJIT' -Version '2.1' -ReleaseDate $date -Developer 'Per-Terra' -SkipPrompt -Force
 
       - name: Push Manifest
         # https://zenn.dev/block/articles/ba618e3dc90f7aff97ba
