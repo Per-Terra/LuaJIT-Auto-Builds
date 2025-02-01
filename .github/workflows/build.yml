@@ -69,7 +69,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LuaJIT
+          name: LuaJIT-${{ matrix.version }}-Win-${{ matrix.arch }}
           path: ${{ github.workspace }}/luajit/LuaJIT_${{ matrix.version }}_Win_${{ matrix.arch }}.zip
 
   build-openresty:
@@ -132,7 +132,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: LuaJIT
+          name: LuaJIT-2.1-OpenResty-Win-${{ matrix.arch }}
           path: ${{ github.workspace }}/luajit2/LuaJIT_2.1_OpenResty_Win_${{ matrix.arch }}.zip
 
   create-release:
@@ -145,8 +145,9 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: LuaJIT
           path: artifacts
+          pattern: LuaJIT-*
+          merge-multiple: true
 
       - name: Set datetime
         id: datetime
