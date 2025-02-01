@@ -67,7 +67,7 @@ jobs:
           Compress-Archive doc, COPYRIGHT, README, src\lua51.dll, src\luajit.exe, About-This-Build.txt -DestinationPath LuaJIT_${{ matrix.version }}_Win_${{ matrix.arch }}.zip
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: LuaJIT
           path: ${{ github.workspace }}/luajit/LuaJIT_${{ matrix.version }}_Win_${{ matrix.arch }}.zip
@@ -130,7 +130,7 @@ jobs:
           Compress-Archive doc, COPYRIGHT, README, README.md, src\lua51.dll, src\luajit.exe, About-This-Build.txt -DestinationPath LuaJIT_2.1_OpenResty_Win_${{ matrix.arch }}.zip
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: LuaJIT
           path: ${{ github.workspace }}/luajit2/LuaJIT_2.1_OpenResty_Win_${{ matrix.arch }}.zip
@@ -143,7 +143,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: LuaJIT
           path: artifacts
