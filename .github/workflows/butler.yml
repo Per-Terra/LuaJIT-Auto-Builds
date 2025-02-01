@@ -23,7 +23,7 @@ jobs:
           path: butler-pkgs
 
       - name: Install and cache PowerShell modules
-        uses: potatoqualitee/psmodulecache@v6.0
+        uses: potatoqualitee/psmodulecache@v6.2
         with:
           modules-to-cache: 7Zip4Powershell, powershell-yaml
 
