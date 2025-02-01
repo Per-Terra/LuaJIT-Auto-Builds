@@ -9,3 +9,9 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    # https://sue445.hatenablog.com/entry/2023/12/15/230043
+    groups:
+      artifact-actions:
+        patterns:
+          - "actions/upload-artifact"
+          - "actions/download-artifact"
